@@ -7,9 +7,9 @@ class ProductItem extends Component {
         }
     }
     render() {
-      var {product,index} = this.props;
-      var statusName = product.status ? 'Available' : 'Sold out';
-      var statusClassName = product.status ? 'label-success' : 'label-warning';
+        var {product,index} = this.props;
+        var statusName = product.status ? 'Available' : 'Sold out';
+        var statusClassName = product.status ? 'label-success' : 'label-warning';
         return (        				
             <tr>
                 <td>{index + 1}</td>

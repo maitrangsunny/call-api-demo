@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import callApi from '../../utils/apiCaller';
 import {Link} from 'react-router-dom';
+import * as action from '../../actions/index';
+import { connect } from 'react-redux';
+import itemEditing from '../../reducers/itemEditing';
+
 class ProductActionPage extends Component {
 	constructor(props) {
 		super(props);
@@ -14,17 +18,18 @@ class ProductActionPage extends Component {
 	componentDidMount(){
 		var { match } = this.props;
 		if(match){
-			var id = match.params.id;
-			console.log(id);
-			callApi(`products/${id}`,'GET',null).then(res=>{
-				var data = res.data
-				this.setState({
-					id: data.id,
-					txtName : data.name,
-					txtPrice: data.price,
-					chbStatus: data.status
-				})
-				
+			var id = match.params.id; //get id from url
+			this.props.onEditProduct(id);
+		}
+	}
+	componentWillReceiveProps(nextProps){
+		if(nextProps && nextProps.itemEditing){
+			var {itemEditing} = nextProps;
+			this.setState({
+				id: itemEditing.id,
+				txtName: itemEditing.name,
+				txtPrice: itemEditing.price,
+				chbStatus: itemEditing.status
 			})
 		}
 	}
@@ -39,30 +44,23 @@ class ProductActionPage extends Component {
 	onSave = (e) => {
 		var { history } = this.props;
 		var {id, txtName,txtPrice,chbStatus} = this.state;
+		var product = {
+			id: id,
+			name: txtName,
+			price: txtPrice,
+			status: chbStatus
+		}
 		e.preventDefault();
 		if(id){
-			callApi(`products/${id}`,'PUT',{
-				name : txtName,
-				price: txtPrice,
-				status: chbStatus
-			}).then(res=>{
-				history.goBack();
-			});
+			this.props.onUpdateProduct(product);
 		}else {
-			callApi("products","POST",{
-				name:  txtName,
-				price: txtPrice,
-				status: chbStatus
-			}).then(res=>{
-				history.goBack();
-			})
+			this.props.onAddProduct(product);
 		}
-		
+		history.goBack();
 	}
   	render() {
 		var {txtName,txtPrice,chbStatus} = this.state;
 		var { match, history } = this.props;
-		console.log(match);
 		return (
 			<div className="container">			
 				<div className="row">			
@@ -120,4 +118,23 @@ class ProductActionPage extends Component {
 		)
   	}
 }
-export default ProductActionPage;
+
+const mapStateToProps = (state) => {
+	itemEditing : state.itemEditing
+}
+
+const mapDispatchToProps = (dispatch, props)=>{
+	return {
+		onAddProduct : (product) => {
+			return dispatch(action.actAddProducRequestApi(product));
+		},
+		onEditProduct : (id) => {
+			return dispatch(action.actEditProductRequestApi(id));
+		},
+		onUpdateProduct : (product) =>{
+			return dispatch(action.actUpdateProductRequestApi(product))
+		}
+	}
+}
+
+export default connect(null,mapDispatchToProps)(ProductActionPage);
