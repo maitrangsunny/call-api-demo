@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import callApi from '../../utils/apiCaller';
 import {Link} from 'react-router-dom';
 import * as action from '../../actions/index';
 import { connect } from 'react-redux';
-import itemEditing from '../../reducers/itemEditing';
 
 class ProductActionPage extends Component {
 	constructor(props) {
@@ -25,6 +23,7 @@ class ProductActionPage extends Component {
 	componentWillReceiveProps(nextProps){
 		if(nextProps && nextProps.itemEditing){
 			var {itemEditing} = nextProps;
+			console.log(itemEditing);
 			this.setState({
 				id: itemEditing.id,
 				txtName: itemEditing.name,
@@ -60,7 +59,6 @@ class ProductActionPage extends Component {
 	}
   	render() {
 		var {txtName,txtPrice,chbStatus} = this.state;
-		var { match, history } = this.props;
 		return (
 			<div className="container">			
 				<div className="row">			
@@ -120,7 +118,10 @@ class ProductActionPage extends Component {
 }
 
 const mapStateToProps = (state) => {
-	itemEditing : state.itemEditing
+	return {
+		itemEditing : state.itemEditing
+	}
+	
 }
 
 const mapDispatchToProps = (dispatch, props)=>{
@@ -136,5 +137,4 @@ const mapDispatchToProps = (dispatch, props)=>{
 		}
 	}
 }
-
-export default connect(null,mapDispatchToProps)(ProductActionPage);
+export default connect(mapStateToProps,mapDispatchToProps)(ProductActionPage);
